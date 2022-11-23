@@ -25,7 +25,7 @@ npm run build
 
 ## node 版本
 
-- Node: v18.12.1
+> Node: v18.12.1
 
 ## 后台项目地址
 
