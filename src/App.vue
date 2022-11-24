@@ -2,7 +2,9 @@
   <div class="box" :style="`background:url(${appBg})`">
     <div class="box-left"></div>
     <div class="box-center" id="china"></div>
-    <div class="box-right"></div>
+    <div class="box-right">
+      {{ store.item }}
+    </div>
   </div>
 </template>
 
@@ -134,6 +136,9 @@ const initCharts = () => {
         data: data
       }
     ]
+  })
+  charts.on('click', (e: any) => {
+    store.item = e.data.children
   })
 }
 </script>
