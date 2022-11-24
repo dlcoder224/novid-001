@@ -32,3 +32,7 @@ npm run build
 ```ts
 https://github.com/dlcoder224/node-novid-001
 ```
+
+## echarts 图表网站
+
+> https://www.isqqw.com/
