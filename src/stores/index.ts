@@ -7,13 +7,14 @@ export const useStore = defineStore({
   state: () => {
     return {
       list: <RootObject>{},
-      item: <Children[]>[]
+      // item: <Children[]>[]
     }
   },
   actions: {
     async getList() {
       const result = await getApiList()
       this.list = result
+      // this.item = result.diseaseh5Shelf.areaTree[0].children
       console.log(result, 'result')
     }
   }
