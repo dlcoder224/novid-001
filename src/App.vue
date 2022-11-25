@@ -12,7 +12,9 @@
 import { onMounted } from 'vue'
 import { useStore } from './stores'
 import * as echarts from 'echarts'
+// 背景图片
 import appBg from './assets/images/bg.jpg'
+// 地址坐标
 import { geoCoordMap } from './assets/ts/geoMap'
 
 import './assets/js/china.js'
@@ -20,6 +22,7 @@ import './assets/js/china.js'
 const store = useStore()
 
 onMounted(async () => {
+  // 获取疫情数据
   await store.getList()
   initCharts()
 })
@@ -126,6 +129,7 @@ const initCharts = () => {
         label: {
           show: true,
           color: '#fff',
+          // echart 格式化函数回调
           formatter(value: any) {
             return value.data.value[2]
           }
