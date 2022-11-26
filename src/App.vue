@@ -3,52 +3,42 @@
     <div class="box-left"></div>
     <div class="box-center" id="china"></div>
     <div class="box-right">
-      <Transition
-        enter-active-class="animate__animated animate__fadeIn"
-        leave-active-class="animate__animated animate__fadeOut"
-      >
-        <el-table
-          :data="tableData"
-          :row-class-name="tableRowClassName"
-          style="width: 100%"
-          height="calc(100vh - 80px)"
-        >
-          <el-table-column prop="name" label="地区" align="center" />
-          <el-table-column prop="confirm" label="新增确诊">
-            <template #default="{ row }">
-              {{ row?.today?.confirm }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="confirmCuts" label="累计确诊" align="center">
-            <template #default="{ row }">
-              {{ row?.total?.confirm }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="heal" label="治愈" align="center">
-            <template #default="{ row }">
-              {{ row?.total?.heal }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="head" label="死亡" align="center">
-            <template #default="{ row }">
-              {{ row?.total?.head }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </Transition>
+      <el-table :data="tableData" :row-class-name="tableRowClassName" style="width: 100%" height="calc(100vh - 80px)">
+        <el-table-column prop="name" label="地区" align="center" />
+        <el-table-column prop="confirm" label="新增确诊">
+          <template #default="{ row }">
+            {{ row?.today?.confirm }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="confirmCuts" label="累计确诊" align="center">
+          <template #default="{ row }">
+            {{ row?.total?.confirm }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="heal" label="治愈" align="center">
+          <template #default="{ row }">
+            {{ row?.total?.heal }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="head" label="死亡" align="center">
+          <template #default="{ row }">
+            {{ row?.total?.head }}
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, reactive } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useStore } from "./stores";
 import * as echarts from "echarts";
 // 背景图片
 import appBg from "./assets/images/bg.jpg";
 // 地址坐标
 import { geoCoordMap } from "./assets/ts/geoMap";
-import type { Children } from "./stores/type";
+import type { Children, ChinaAdd, ChinaTotal } from "./stores/type";
 import "./assets/js/china.js";
 
 interface tableData {
@@ -74,6 +64,8 @@ const tableRowClassName = ({
 };
 
 let tableData = reactive(<Children[]>[]);
+let ChinaAdd = ref(<ChinaAdd>{})
+let ChinaTotal = ref(<ChinaTotal>{})
 
 onMounted(async () => {
   window.addEventListener("resize", changeSizeFn);
@@ -84,7 +76,6 @@ onMounted(async () => {
 });
 
 const changeSizeFn = () => {
-  console.log(1111);
   nextTick(() => {
     initCharts();
   });
@@ -96,8 +87,11 @@ onBeforeUnmount(() => {
 
 const initCharts = () => {
   const charts = echarts.init(document.querySelector("#china") as HTMLElement);
-  const city = store.list.diseaseh5Shelf.areaTree[0].children;
+  const tempData = store.list.diseaseh5Shelf
+  const city = tempData.areaTree[0].children;
   tableData.push(...city);
+  ChinaAdd.value = tempData.chinaAdd
+  ChinaTotal.value = tempData.chinaTotal
   const data = city.map((v) => {
     return {
       name: v.name,
@@ -224,24 +218,36 @@ const initCharts = () => {
   overflow: hidden;
 
   display: flex;
+
   &-left {
     width: 400px;
   }
+
   &-center {
     flex: 1;
   }
-  &-right {
+
+  &-right ::v-deep {
     width: 400px;
-    .el-table ::v-deep {
-      margin-top: 30px;
+    color: #ffffff;
+
+    .el-table {
       background-color: transparent;
+      margin-top: 30px;
+
+      thead {
+        color: #ffffff;
+      }
+
       .el-table__inner-wrapper {
-        & ::before {
-          background-color: red !important;
+        &::before {
+          height: 0;
         }
+
         .warning-row {
           --el-table-tr-bg-color: var(--el-color-warning-light-9);
         }
+
         .success-row {
           --el-table-tr-bg-color: var(--el-color-success-light-9);
         }
