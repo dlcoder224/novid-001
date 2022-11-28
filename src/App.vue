@@ -1,6 +1,41 @@
 <template>
   <div class="box" :style="`background:url(${appBg})`">
-    <div class="box-left"></div>
+    <div class="box-left">
+      <div class="box-left-card">
+        <section>
+          <div>较上日+ {{ chinaAdd.localConfirmH5 }}</div>
+          <div>{{ chinaTotal.localConfirm }}</div>
+          <div>本土现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ chinaAdd.nowConfirm }}</div>
+          <div>{{ chinaTotal.nowConfirm }}</div>
+          <div>现有确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ chinaAdd.confirm }}</div>
+          <div>{{ chinaTotal.confirm }}</div>
+          <div>累计确诊</div>
+        </section>
+        <section>
+          <div>较上日+ {{ chinaAdd.noInfect }}</div>
+          <div>{{ chinaTotal.noInfect }}</div>
+          <div>无症状感染者</div>
+        </section>
+        <section>
+          <div>较上日+ {{ chinaAdd.importedCase }}</div>
+          <div>{{ chinaTotal.importedCase }}</div>
+          <div>境外输入</div>
+        </section>
+        <section>
+          <div>较上日+ {{ chinaAdd.dead }}</div>
+          <div>{{ chinaTotal.dead }}</div>
+          <div>累计死亡</div>
+        </section>
+      </div>
+      <div class="box-left-pie"></div>
+      <div class="box-left-line"></div>
+    </div>
     <div class="box-center" id="china"></div>
     <div class="box-right">
       <el-table :data="tableData" :row-class-name="tableRowClassName" style="width: 100%" height="calc(100vh - 80px)">
@@ -22,7 +57,7 @@
         </el-table-column>
         <el-table-column prop="head" label="死亡" align="center">
           <template #default="{ row }">
-            {{ row?.total?.head }}
+            {{ row?.total?.head ? row?.total?.head : 0 }}
           </template>
         </el-table-column>
       </el-table>
@@ -31,11 +66,11 @@
 </template>
 
 <script lang="ts" setup>
+// 背景图片
+import appBg from "./assets/images/bg.jpg";
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useStore } from "./stores";
 import * as echarts from "echarts";
-// 背景图片
-import appBg from "./assets/images/bg.jpg";
 // 地址坐标
 import { geoCoordMap } from "./assets/ts/geoMap";
 import type { Children, ChinaAdd, ChinaTotal } from "./stores/type";
@@ -64,8 +99,9 @@ const tableRowClassName = ({
 };
 
 let tableData = reactive(<Children[]>[]);
-let ChinaAdd = ref(<ChinaAdd>{})
-let ChinaTotal = ref(<ChinaTotal>{})
+let cityDetail = reactive(<Children[]>[]);
+let chinaAdd = ref(<ChinaAdd>{});
+let chinaTotal = ref(<ChinaTotal>{});
 
 onMounted(async () => {
   window.addEventListener("resize", changeSizeFn);
@@ -73,6 +109,8 @@ onMounted(async () => {
   // 获取疫情数据
   await store.getList();
   initCharts();
+  initPre();
+  initLine();
 });
 
 const changeSizeFn = () => {
@@ -87,11 +125,12 @@ onBeforeUnmount(() => {
 
 const initCharts = () => {
   const charts = echarts.init(document.querySelector("#china") as HTMLElement);
-  const tempData = store.list.diseaseh5Shelf
+  const tempData = store.list.diseaseh5Shelf;
   const city = tempData.areaTree[0].children;
   tableData.push(...city);
-  ChinaAdd.value = tempData.chinaAdd
-  ChinaTotal.value = tempData.chinaTotal
+  chinaAdd.value = tempData.chinaAdd;
+  chinaTotal.value = tempData.chinaTotal;
+  cityDetail.push(...city[11].children.slice(0, 9));
   const data = city.map((v) => {
     return {
       name: v.name,
@@ -206,21 +245,219 @@ const initCharts = () => {
     // store.item = e.data.children;
     tableData.splice(0);
     tableData.push(...e.data.children);
-    console.log(e, "e");
-    console.log(tableData, "tableData");
+    cityDetail.splice(0);
+    cityDetail.push(...e.data.children.slice(0, 9));
   });
+};
+
+const initPre = () => {
+  const charts = echarts.init(
+    document.querySelector(".box-left-pie") as HTMLElement
+  );
+  charts.setOption({
+    backgroundColor: "#223651",
+    tooltip: {
+      trigger: "item",
+    },
+    series: [
+      {
+        type: "pie",
+        radius: ["40%", "70%"],
+        itemStyle: {
+          borderRadius: 4,
+          borderColor: "#fff",
+          borderWidth: 2,
+        },
+        label: {
+          show: true,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: "15",
+            fontWeight: "bold",
+          },
+        },
+        data: cityDetail.map((v) => {
+          return {
+            name: v.name,
+            value: v.adcode,
+          };
+        }),
+      },
+    ],
+  });
+};
+const initLine = () => {
+  const charts = echarts.init(
+    document.querySelector(".box-left-line") as HTMLElement
+  );
+
+  var data = [
+    ...cityDetail.slice(0,3)
+  ];
+  const xData = <any[]>[]
+  const yData = <any[]>[];
+
+  var min = 50;
+
+  data.map(function (a, b) {
+    xData.push(a.name);
+    if (a.adcode === '0') {
+      yData.push(a.adcode + min);
+    } else {
+      yData.push(a.adcode);
+    }
+  });
+
+  const option = {
+    backgroundColor: "#223651",
+    color: ["#3398DB"],
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "line",
+        lineStyle: {
+          opacity: 0,
+        },
+      },
+      formatter: function (prams:any) {
+        if (prams[0].data === min) {
+          return "活动分析：0%";
+        } else {
+          return "活动分析：" + prams[0].data;
+        }
+      },
+    },
+    grid: {
+      left: "15%",
+      top: "10%",
+      right: "5%",
+      bottom: "12%",
+      // containLabel: true,
+    },
+    xAxis: [
+      {
+        type: "category",
+        gridIndex: 0,
+        data: xData,
+        axisTick: {
+          show: false,
+        },
+        axisLine: {
+          show: false,
+          lineStyle: {
+            color: "#0c3b71",
+          },
+        },
+        axisLabel: {
+          show: true,
+          color: "rgb(170,170,170)",
+          fontSize: 14,
+        },
+      },
+    ],
+    yAxis: [
+      {
+        type: "value",
+        // name:"单位:户",
+        nameTextStyle: {
+          color: "rgb(170,170,170)",
+        },
+        splitLine: {
+          show: true,
+          lineStyle: {
+            color: "rgba(255,255,255,0.2)", //网格线的颜色
+            type: "dashed",
+          },
+        },
+        // min: min,
+        // max: 100,
+        axisLine: {
+          show: false,
+        },
+        axisLabel: {
+          color: "rgb(170,170,170)",
+          formatter: "{value}",
+        },
+      },
+    ],
+    series: [
+      {
+        // 分隔
+        type: "pictorialBar",
+        itemStyle: {
+          normal: {
+            color: "#6DF95A",
+          },
+        },
+        symbolRepeat: "fixed",
+        symbolMargin: 4,
+        symbol: "rect",
+        symbolClip: true,
+        symbolSize: [30, 8],
+        symbolPosition: "start",
+        symbolOffset: [0, -1],
+        data: yData,
+        // width: 25,
+        z: 0,
+        zlevel: 8,
+      },
+    ],
+  };
+
+  charts.setOption(option);
 };
 </script>
 
 <style lang="less" scoped>
+@white: #ffffff;
+@itemBg: #223651;
+@itemColor: #41b0db;
+@itemBorder: #212028;
+
 .box {
   height: 100%;
   overflow: hidden;
+  padding-top: 30px;
 
   display: flex;
 
   &-left {
     width: 400px;
+
+    &-pie {
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    &-line {
+      height: 230px;
+      margin-top: 20px;
+    }
+
+    &-card {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      grid-template-rows: auto auto;
+
+      section {
+        background-color: @itemBg;
+        border: 1px solid @itemBorder;
+        padding: 10px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        div:nth-child(2) {
+          color: @itemColor;
+          padding: 10px 0;
+          font-size: 20px;
+          font-weight: bold;
+        }
+      }
+    }
   }
 
   &-center {
@@ -229,14 +466,13 @@ const initCharts = () => {
 
   &-right ::v-deep {
     width: 400px;
-    color: #ffffff;
+    color: @white;
 
     .el-table {
       background-color: transparent;
-      margin-top: 30px;
 
       thead {
-        color: #ffffff;
+        color: @white;
       }
 
       .el-table__inner-wrapper {

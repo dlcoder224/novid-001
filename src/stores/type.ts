@@ -1,55 +1,55 @@
 export interface ChinaTotal {
   noInfect: number
-  showLocalConfirm: number
-  local_acc_confirm: number
-  localWzzAdd: number
-  nowSevere: number
-  dead: number
   localConfirmH5: number
-  confirmAdd: number
+  localWzzAdd: number
   highRiskAreaNum: number
+  suspect: number
+  dead: number
+  deadAdd: number
   confirm: number
+  local_acc_confirm: number
+  confirmAdd: number
   mtime: string
-  localConfirmAdd: number
-  nowConfirm: number
+  mediumRiskAreaNum: number
+  localConfirm: number
   mRiskTime: string
-  heal: number
+  nowSevere: number
   importedCase: number
+  showLocalConfirm: number
   showlocalinfeciton: number
   noInfectH5: number
   nowLocalWzz: number
-  deadAdd: number
-  mediumRiskAreaNum: number
-  localConfirm: number
-  suspect: number
+  localConfirmAdd: number
+  nowConfirm: number
+  heal: number
 }
 
 export interface ChinaAdd {
-  localConfirmH5: number
-  heal: number
   dead: number
+  nowConfirm: number
   suspect: number
+  importedCase: number
+  noInfectH5: number
+  confirm: number
+  heal: number
   nowSevere: number
   noInfect: number
   localConfirm: number
-  noInfectH5: number
-  confirm: number
-  nowConfirm: number
-  importedCase: number
+  localConfirmH5: number
 }
 
 export interface ShowAddSwitch {
-  all: boolean
-  nowConfirm: boolean
-  importedCase: boolean
+  confirm: boolean
+  dead: boolean
   noInfect: boolean
   localConfirm: boolean
-  localinfeciton: boolean
-  confirm: boolean
+  all: boolean
   suspect: boolean
-  dead: boolean
   heal: boolean
+  nowConfirm: boolean
   nowSevere: boolean
+  importedCase: boolean
+  localinfeciton: boolean
 }
 
 export interface Today {
@@ -59,48 +59,48 @@ export interface Today {
 
 export interface Total {
   dead: number
-  heal: number
+  showHeal: boolean
   mediumRiskAreaNum: number
-  mtime: string
+  continueDayZeroLocalConfirm: number
   confirm: number
   continueDayZeroLocalConfirmAdd: number
   nowConfirm: number
   showRate: boolean
-  provinceLocalConfirm: number
+  heal: number
   highRiskAreaNum: number
-  adcode: string
-  showHeal: boolean
   wzz: number
-  continueDayZeroLocalConfirm: number
+  provinceLocalConfirm: number
+  mtime: string
+  adcode: string
 }
 
 export interface Today {
+  abroad_confirm_add: number
+  dead_add: number
   confirm: number
   confirmCuts: number
   isUpdated: boolean
   tip: string
   wzz_add: number
   local_confirm_add: number
-  abroad_confirm_add: number
-  dead_add: number
 }
 
 export interface Total {
-  nowConfirm: number
-  confirm: number
+  showHeal: boolean
+  adcode: string
   mediumRiskAreaNum: number
   continueDayZeroLocalConfirmAdd: number
-  mtime: string
-  adcode: string
+  nowConfirm: number
+  confirm: number
   dead: number
-  wzz: number
-  provinceLocalConfirm: number
   showRate: boolean
   heal: number
-  showHeal: boolean
-  continueDayZeroConfirm: number
-  highRiskAreaNum: number
+  provinceLocalConfirm: number
   continueDayZeroConfirmAdd: number
+  continueDayZeroConfirm: number
+  wzz: number
+  highRiskAreaNum: number
+  mtime: string
 }
 
 export interface Today {
@@ -112,20 +112,20 @@ export interface Today {
 }
 
 export interface Total {
-  confirm: number
-  nowConfirm: number
-  heal: number
-  mediumRiskAreaNum: number
-  adcode: string
-  wzz: number
-  provinceLocalConfirm: number
-  continueDayZeroLocalConfirmAdd: number
-  continueDayZeroLocalConfirm: number
-  dead: number
   showRate: boolean
-  showHeal: boolean
+  nowConfirm: number
+  dead: number
+  adcode: string
+  confirm: number
+  provinceLocalConfirm: number
   highRiskAreaNum: number
+  continueDayZeroLocalConfirmAdd: number
   mtime: string
+  heal: number
+  showHeal: boolean
+  wzz: number
+  mediumRiskAreaNum: number
+  continueDayZeroLocalConfirm: number
 }
 
 export interface Children {
@@ -137,30 +137,47 @@ export interface Children {
 }
 
 export interface Children {
-  name: string
-  adcode: string
   date: string
   today: Today
   total: Total
   children: Children[]
+  name: string
+  adcode: string
 }
 
 export interface AreaTree {
-  name: string
   today: Today
   total: Total
   children: Children[]
+  name: string
 }
 
 export interface Diseaseh5Shelf {
+  lastUpdateTime: string
   chinaTotal: ChinaTotal
   chinaAdd: ChinaAdd
   isShowAdd: boolean
   showAddSwitch: ShowAddSwitch
   areaTree: AreaTree[]
-  lastUpdateTime: string
+}
+
+export interface StatisGradeCityDetail {
+  nowConfirm: number
+  confirm: number
+  syear: number
+  dead: number
+  heal: number
+  grade: string
+  date: string
+  mtime: string
+  province: string
+  city: string
+  confirmAdd: number
+  sdate: string
+  wzz_add: string
 }
 
 export interface RootObject {
   diseaseh5Shelf: Diseaseh5Shelf
+  statisGradeCityDetail: StatisGradeCityDetail[]
 }
